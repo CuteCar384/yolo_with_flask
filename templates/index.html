@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLOV8分割示例</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('static/backgrounds/3.0x-gergon.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        h1, form {
+            margin-bottom: 20px;
+            width: 100%;
+            color: #8B4513; /* 棕色字体 */
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        label {
+            margin-bottom: 5px;
+        }
+
+        input, select, button {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .feedback {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .feedback p {
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
+        .feedback img {
+            max-width: 100%;
+            max-height: 400px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .image-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .feedback {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .feedback p {
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
+        .feedback img {
+            max-width: 100%;
+            max-height: 400px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .image-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+        }
+        /* 其他样式不变... */
+
+    </style>
+</head>
+<body>
+    <h1>来看看效果吧~</h1>
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="file">选择文件:</label>
+          <input type="file" name="file" id="file" accept=".png, .jpg, .jpeg, .gif" required onchange="showUploadedImg(this)">
+
+        <label for="model_option">选择一个模型:</label>
+        <select name="model_option" id="model_option">
+            <option value="yolov8n-seg.pt">yolov8n-seg.pt</option>
+            <option value="yolov8s-seg.pt">yolov8s-seg.pt</option>
+            <option value="yolov8m-seg.pt">yolov8m-seg.pt</option>
+        </select>
+        <button type="submit">提交图片</button>
+    </form>
+
+    {% if filename or processed_image %}
+        <div class="feedback">
+            {% if filename %}
+                <p>图片上传成功！</p>
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="已上传的图片">
+                    {% if processed_image %}
+                        <img src="{{ url_for('static', filename='results/' + processed_image) }}" alt="处理后的图片">
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+  <div class="feedback" id="feedbackDiv" style="display: none;">
+        <p id="uploadSuccessMsg" style="display: none;">图片上传成功！</p>
+        <div class="image-container" id="imageContainer">
+            <img id="uploadedImg" alt="已上传的图片" style="display: none;">
+            <img id="processedImg" alt="处理后的图片" style="display: none;">
+        </div>
+    </div>
+
+    <script>
+    function showUploadedImg(input) {
+        var uploadedImg = document.getElementById('uploadedImg');
+        var processedImg = document.getElementById('processedImg');
+        var feedbackDiv = document.getElementById('feedbackDiv');
+        var uploadSuccessMsg = document.getElementById('uploadSuccessMsg');
+
+        // Reset previous images and messages
+        uploadedImg.src = '';
+        processedImg.src = '';
+        uploadedImg.style.display = 'none';
+        processedImg.style.display = 'none';
+        uploadSuccessMsg.style.display = 'none';
+        feedbackDiv.style.display = 'none';
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            uploadedImg.src = e.target.result;
+            uploadedImg.style.display = 'block';
+            uploadSuccessMsg.style.display = 'block';
+            feedbackDiv.style.display = 'flex';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+</script>
+</body>
+</html>
